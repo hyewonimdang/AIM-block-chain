@@ -1,0 +1,23 @@
+{
+  "name": "aim-block-chain",
+  "private": true,
+  "version": "0.1.0",
+  "description": "블록체인 백엔드 적성 검증 미니 프로젝트 (진로 가설 검증용)",
+  "workspaces": [
+    "server",
+    "web",
+    "journal"
+  ],
+  "scripts": {
+    "server": "npm run dev -w server",
+    "node1": "cross-env PORT=3001 npm run dev -w server",
+    "node2": "cross-env PORT=3002 npm run dev -w server",
+    "node3": "cross-env PORT=3003 npm run dev -w server",
+    "web": "npm run dev -w web",
+    "log": "npm run log -w journal",
+    "log:csv": "npm run csv -w journal"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3"
+  }
+}

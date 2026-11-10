@@ -1,0 +1,197 @@
+:root {
+  --bg: #0f1115;
+  --panel: #181b22;
+  --border: #2a2f3a;
+  --text: #e6e8ee;
+  --muted: #8b93a7;
+  --accent: #4f8cff;
+  --ok: #3ddc84;
+  --broken: #ff5c5c;
+  --warn: #ffb547;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+}
+
+.app-header h1 {
+  font-size: 20px;
+  margin: 0;
+}
+
+nav {
+  display: flex;
+  gap: 8px;
+}
+
+nav button,
+button {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+nav button.active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+button:hover {
+  border-color: var(--accent);
+}
+
+input,
+select {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 14px;
+}
+
+.todo {
+  color: var(--warn);
+  border: 1px dashed var(--warn);
+  padding: 12px;
+  border-radius: 8px;
+}
+
+/* 블록 카드 (ChainView 에서 사용) */
+.chain {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 8px 0;
+}
+
+.block-card {
+  min-width: 220px;
+  background: var(--panel);
+  border: 2px solid var(--ok);
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 12px;
+}
+
+.block-card.broken {
+  border-color: var(--broken);
+  background: #2a1717;
+}
+
+.block-card .hash {
+  font-family: ui-monospace, Consolas, monospace;
+  word-break: break-all;
+  color: var(--muted);
+}
+
+.arrow {
+  color: var(--muted);
+  font-size: 24px;
+}
+
+/* 노드 3열 */
+.nodes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.node-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.node-panel.offline {
+  opacity: 0.4;
+}
+
+/* 대시보드 */
+.dash-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.dash-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.dash-card h3 {
+  margin: 0 0 12px;
+  font-size: 15px;
+}
+
+@media (max-width: 800px) {
+  .dash-grid,
+  .nodes-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dash-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.dash-table th,
+.dash-table td {
+  text-align: left;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.dash-table th {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  margin-right: 6px;
+}
+
+code {
+  background: #ffffff12;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-family: ui-monospace, Consolas, monospace;
+}
