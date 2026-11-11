@@ -121,6 +121,62 @@
 
 ## 2단계
 
+### 2-1
+
+1. 한 것: validateChain 의 for 루프에서 hash 검사(isBlockHashValid)를 맨 앞으로 옮기고 테스트를 돌렸다.
+
+2. 결과: 28개 중 2개 실패
+   - "prevHash 가 끊기면 그 블록에서 prevHash mismatch" → received: "hash mismatch"
+   - "index 가 어긋나면 index mismatch" → received: "hash mismatch"
+   둘 다 valid 는 여전히 false 고 brokenAt 도 같았다. reason 문자열만 달라졌다.
+
+3. 왜 그런가
+   테스트는 prevHash 나 index 를 바꾸기만 하고 hash 는 다시 계산하지 않는다.
+   그런데 hash 는 index, timestamp, data, prevHash, nonce 다섯 값으로 만든 것이라서,
+   그중 하나만 바뀌어도 다시 계산한 hash 가 저장된 hash 와 달라진다.
+   그래서 hash 검사를 먼저 하면 index 변조든 prevHash 변조든 전부 "hash mismatch" 로 잡힌다.
+   1-1 에서 본 "내용이 바뀌면 hash 가 바뀐다" 가 그대로 작동한 것이다.
+
+4. 순서가 왜 중요한가
+   hash 검사는 포괄적이라 뭐든 잡지만, 무엇이 잘못됐는지는 말해 주지 않는다.
+   index 비교나 prevHash 비교는 값싸고 구체적이다. 그래서 구체적인 검사를 먼저, 포괄적인 검사를 나중에 둔다.
+   reason 은 "첫 번째로 걸린 검사의 이름" 이기 때문에, 검사 순서가 곧 에러 메시지의 품질이다.
+
+5. 배운 점
+   "틀렸다" 를 아는 것과 "어디가 어떻게 틀렸다" 를 아는 것은 다르다. 검증 함수를 설계할 때는 후자를 위해 순서를 정한다.
+   테스트가 reason 까지 확인하고 있어서 순서 변경이 바로 잡혔다. 테스트가 사양서 역할을 한다는 걸 느꼈다.
+
+### 2-2
+
+1. 한 것: validateChain 과 달리 첫 실패에서 멈추지 않고 깨진 블록을 전부 모으는 findAllBroken 을 추가했다.
+   (함수 본문과 테스트는 AI 코드를 참고했고, 실행과 결과 해석은 직접 했다 → review-log 에 기록)
+
+2. 구조
+   validateChain 의 for 루프를 그대로 가져와서, return 하던 자리를 broken.push(...) 와 continue 로 바꿨다.
+   continue 는 "이 블록은 처리했으니 다음 블록으로" 라는 뜻이라, 한 블록에서 첫 번째 문제만 기록하고 넘어간다.
+   루프가 끝나면 배열을 돌려준다. 바꾼 것은 사실상 이것뿐인데 함수의 의미가 "검사" 에서 "수집" 으로 바뀌었다.
+
+3. 테스트 결과: 29개 통과
+   - 1번 블록은 data 만 변조 → hash mismatch
+   - 2번 블록은 data 변조 + hash 재계산 → 2번 자체는 결과에 없고, 3번이 prevHash mismatch 로 잡힘
+   - 같은 체인을 validateChain 에 넣으면 brokenAt=1 에서 멈춰서 3번 문제는 알 수 없다
+
+4. 2번이 결과에 없는 이유
+   2번은 hash 를 다시 계산했기 때문에 "내용과 hash 가 일치" 한다. 자기 자신만 보면 멀쩡하다.
+   대신 2번의 hash 가 바뀌었으니 3번이 들고 있던 prevHash(옛날 2번 hash)와 안 맞게 되고, 3번에서 걸린다.
+   즉 조작한 블록이 아니라 그 다음 블록에서 발각된다. 4단계 tamper.ts 주석의 "실험 2" 상황이다.
+   완전히 숨기려면 3번 이후를 전부 다시 만들어야 하고, 작업증명이 그 비용을 키운다.
+
+5. validateChain 과 findAllBroken 중 어느 쪽이 맞는가
+   둘 다 맞고 용도가 다르다.
+   - validateChain: "이 체인을 믿어도 되는가" 에 답한다. 하나라도 깨지면 뒤는 볼 필요가 없으니 멈추는 게 맞다. (5단계 resolve 에서 쓰는 이유)
+   - findAllBroken: "어디어디가 깨졌는가" 를 보여준다. 디버깅이나 시각화용.
+   다만 findAllBroken 도 "진짜 조작된 블록" 이 아니라 "검사에 걸린 블록" 을 보여주는 것이라, 2번처럼 발각 위치와 조작 위치가 다를 수 있다.
+
+6. 배운 점
+   같은 루프에서 return 이냐 push 냐에 따라 함수의 역할이 달라진다.
+   그리고 블록체인에서 "조작된 위치" 와 "발각되는 위치" 는 다를 수 있다. 이게 프론트에서 깨진 블록 이후를 전부 빨갛게 칠하는 이유인 것 같다.
+
 ## 3단계
 
 ## 4단계

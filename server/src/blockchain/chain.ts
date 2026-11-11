@@ -100,6 +100,47 @@ export function validateChain(
   return { valid: true, brokenAt: null, reason: null };
 }
 
+/**
+ * [연습 2-2] 깨진 블록을 전부 찾습니다. (validateChain 과 달리 첫 실패에서 멈추지 않음)
+ *
+ * 반환 예: [{ index: 2, reason: "hash mismatch" }, { index: 3, reason: "prevHash mismatch" }]
+ *
+ * TODO:
+ *  - validateChain 의 for 루프를 참고해서, return 대신 배열에 push 하고 계속 진행
+ *  - 블록 하나에 여러 문제가 있으면 첫 번째 이유만 넣어도 됨
+ *  - 제네시스 검사는 생략해도 됨 (1번부터)
+ */
+export function findAllBroken(
+  target: Chain,
+  difficulty: number = powConfig.difficulty,
+): { index: number; reason: string }[] {
+  const broken: { index: number; reason: string }[] = [];
+
+  for (let i = 1; i < target.length; i++) {
+    const block = target[i];
+    const prev = target[i - 1];
+
+    // validateChain 과 같은 검사. return 대신 push + continue 로 "다음 블록으로" 넘어간다.
+    if (block.index !== i) {
+      broken.push({ index: i, reason: "index mismatch" });
+      continue;
+    }
+    if (block.prevHash !== prev.hash) {
+      broken.push({ index: i, reason: "prevHash mismatch" });
+      continue;
+    }
+    if (!isBlockHashValid(block)) {
+      broken.push({ index: i, reason: "hash mismatch" });
+      continue;
+    }
+    if (!hashMeetsDifficulty(block.hash, difficulty)) {
+      broken.push({ index: i, reason: "difficulty not met" });
+    }
+  }
+
+  return broken;
+}
+
 /** 체인 내용을 통째로 교체합니다. 5단계 합의(resolve)에서 사용합니다. */
 export function replaceChain(next: Chain): void {
   chain.length = 0;

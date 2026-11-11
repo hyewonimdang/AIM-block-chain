@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { chain, initChain, validateChain, isBlockHashValid } from "./chain.js";
+import { chain, initChain, validateChain, isBlockHashValid, findAllBroken } from "./chain.js";
 import { createGenesisBlock, createNextBlock } from "./block.js";
 import { tamperBlock } from "./tamper.js";
 
@@ -77,5 +77,16 @@ describe("4단계: tamperBlock", () => {
 
   it("범위 밖 index 는 null", () => {
     expect(tamperBlock(99, "x")).toBeNull();
+  });
+
+  it("[연습 2-2] findAllBroken 은 깨진 블록을 전부 찾는다", () => {
+    tamperBlock(2, "hacked", { recompute: true }); // 2번은 멀쩡해 보이고 3번이 prevHash mismatch
+    tamperBlock(1, "hacked"); // 1번은 hash mismatch
+    expect(findAllBroken(chain, 0)).toEqual([
+      { index: 1, reason: "hash mismatch" },
+      { index: 3, reason: "prevHash mismatch" },
+    ]);
+    // validateChain 은 1번에서 멈추므로 3번 문제는 알려주지 못한다
+    expect(validateChain(chain, 0)).toMatchObject({ brokenAt: 1, reason: "hash mismatch" });
   });
 });
