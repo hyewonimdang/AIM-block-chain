@@ -56,7 +56,7 @@ TypeScript로 블록체인 API 서버와 멀티 노드 동기화를 구현·실�
 
 구조와 API 상세는 [docs/architecture.md](docs/architecture.md).
 
-## 4. 진행 방식과 AI 활용 (정직한 기록)
+## 4. 진행 방식과 AI 활용
 
 - 핵심 로직과 시각화 화면은 **AI가 튜터 역할로 시범 구현**했다. 나는 코드를 분석하고 [docs/study-guide.md](docs/study-guide.md)의
   연습 문제(실험·코드 변경·측정)를 직접 수행하며 [docs/study-notes.md](docs/study-notes.md)에 기록했다.
