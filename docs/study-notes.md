@@ -383,4 +383,3 @@
    receiveBlock 의 세 갈래(appended / need-sync / rejected)가 각각 어떤 상황인지 로그 한 줄에서 전부 봤다.
 
 
-## 6단계

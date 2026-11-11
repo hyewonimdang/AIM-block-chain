@@ -96,13 +96,6 @@ curl localhost:3001/chain
 
 ---
 
-## 6단계 · 프론트엔드 시각화   `[프론트엔드]`
-
-읽을 파일: `web/src/lib/hash.ts` → `components/BlockCard.tsx` → `ChainView.tsx` → `MiningView.tsx` → `NodesView.tsx`
-
-연습 문제 (프론트가 강점이므로 직접 코드를 수정하는 과제)
-1. ChainView 의 화살표를 SVG 선으로 바꾸고, 끊긴 연결은 점선으로 그려 보자.
-
 ---
 
 ## 단계별 활동 일지 기록 요령
