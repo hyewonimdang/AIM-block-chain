@@ -1,17 +1,28 @@
-import { Router } from "express";
-import { chain, validateChain, tamperBlock, getLatestBlock } from "../blockchain/chain.js";
+import { Router, type Request, type Response, type NextFunction } from "express";
+import { chain, validateChain, getLatestBlock } from "../blockchain/chain.js";
+import { tamperBlock } from "../blockchain/tamper.js";
 import { createNextBlock } from "../blockchain/block.js";
 import { mineBlock, powConfig } from "../blockchain/pow.js";
+import { broadcastBlock } from "../network/nodes.js";
 
 /**
- * 블록체인 API 라우터 (보일러플레이트)
+ * 블록체인 API 라우터
  *
- * Express 기초:
+ * [Express 기초]
  *  - router.get(경로, (req, res) => {...})  → GET 요청 처리
- *  - req.params.index  → URL의 :index 부분
- *  - req.body          → JSON 본문 (app.ts에서 express.json() 미들웨어를 등록해야 파싱됨)
+ *  - req.params.index  → URL 의 :index 부분 (문자열이므로 Number() 로 변환)
+ *  - req.body          → JSON 본문 (app.ts 의 express.json() 미들웨어가 파싱)
  *  - res.status(400).json({...}) → 상태코드 + JSON 응답
+ *
+ * [async 핸들러 주의]
+ *  Express 4 는 async 함수에서 던져진 에러를 잡지 못합니다. (5 부터 지원)
+ *  그래서 asyncHandler 로 감싸 next(err) 로 넘겨 app.ts 의 에러 핸들러가 처리하게 합니다.
  */
+type AsyncHandler = (req: Request, res: Response) => Promise<void>;
+export const asyncHandler =
+  (fn: AsyncHandler) => (req: Request, res: Response, next: NextFunction) =>
+    fn(req, res).catch(next);
+
 export const chainRouter = Router();
 
 /** GET /chain — 전체 체인 */
@@ -26,46 +37,52 @@ chainRouter.get("/chain/latest", (_req, res) => {
 
 /**
  * POST /blocks  body: { data: string, mine?: boolean }
- *  - 1단계: mine=false 로 호출하면 createNextBlock 사용 (작업증명 없음)
- *  - 3단계 이후: mine 생략(기본) 또는 true → mineBlock 사용. 응답에 attempts, elapsedMs 포함.
- *
- * 5단계: 블록을 만든 뒤 broadcastBlock(block) 호출을 여기에 추가하세요.
+ *  - mine=false : 작업증명 없이 추가 (1단계 학습용). 난이도>0 이면 /validate 에서 걸립니다.
+ *  - 기본       : mineBlock 으로 채굴. 응답에 attempts, elapsedMs 포함.
+ *  - 5단계      : 추가한 블록을 피어에게 전파하고 결과(broadcast)를 함께 돌려줍니다.
  */
-chainRouter.post("/blocks", (req, res) => {
-  const { data, mine } = req.body ?? {};
-  if (typeof data !== "string" || data.length === 0) {
-    res.status(400).json({ error: "data(string) is required" });
-    return;
-  }
+chainRouter.post(
+  "/blocks",
+  asyncHandler(async (req, res) => {
+    const { data, mine } = req.body ?? {};
+    if (typeof data !== "string" || data.length === 0) {
+      res.status(400).json({ error: "data(string) is required" });
+      return;
+    }
 
-  const prev = getLatestBlock();
+    const prev = getLatestBlock();
 
-  if (mine === false) {
-    const block = createNextBlock(prev, data);
-    chain.push(block);
-    res.status(201).json({ block });
-    return;
-  }
+    if (mine === false) {
+      const block = createNextBlock(prev, data);
+      chain.push(block);
+      const broadcast = await broadcastBlock(block);
+      res.status(201).json({ block, broadcast });
+      return;
+    }
 
-  const result = mineBlock(prev, data);
-  chain.push(result.block);
-  res.status(201).json(result);
+    const result = mineBlock(prev, data);
+    chain.push(result.block);
+    const broadcast = await broadcastBlock(result.block);
+    res.status(201).json({ ...result, broadcast });
+  }),
+);
+
+/** GET /validate?difficulty=N — 체인 검증. difficulty 생략 시 현재 설정값 */
+chainRouter.get("/validate", (req, res) => {
+  const raw = req.query.difficulty;
+  const difficulty = raw === undefined ? powConfig.difficulty : Number(raw);
+  res.json(validateChain(chain, Number.isInteger(difficulty) ? difficulty : powConfig.difficulty));
 });
 
-/** GET /validate — 체인 검증 */
-chainRouter.get("/validate", (_req, res) => {
-  res.json(validateChain(chain));
-});
-
-/** POST /tamper/:index  body: { data: string } */
+/** POST /tamper/:index  body: { data: string, recompute?: boolean } */
 chainRouter.post("/tamper/:index", (req, res) => {
   const index = Number(req.params.index);
-  const { data } = req.body ?? {};
+  const { data, recompute } = req.body ?? {};
   if (!Number.isInteger(index) || typeof data !== "string") {
     res.status(400).json({ error: "index(int) and data(string) are required" });
     return;
   }
-  const block = tamperBlock(index, data);
+  const block = tamperBlock(index, data, { recompute: recompute === true });
   if (!block) {
     res.status(404).json({ error: `block ${index} not found` });
     return;
