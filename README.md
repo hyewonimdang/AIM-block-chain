@@ -183,7 +183,15 @@ npm run log:csv                   # CSV 내보내기
 - [ ] 1단계: 블록 생성 결과 (`GET /chain`)
 - [ ] 2단계: 검증 결과
 - [ ] 3단계: 난이도별 채굴 시간
-- [ ] 4단계: 위변조 후 빨간색 표시 화면
+- [x] 4단계: 위변조 후 빨간색 표시 화면
+
+  실험 1 (data 만 변경 → #2 hash mismatch, 연결은 유지)
+
+  ![4단계 실험 1](docs/images/stage4-tamper-data-only.png)
+
+  실험 2 (data 변경 + hash 재계산 → #2 difficulty not met, #2→#3 연결 끊김)
+
+  ![4단계 실험 2](docs/images/stage4-tamper-recompute.png)
 - [ ] 5단계: 노드 3개 동기화 화면
 - [ ] 활동 일지 대시보드
 
