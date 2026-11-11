@@ -14,10 +14,23 @@ export interface ValidationResult {
   reason: string | null;
 }
 
+export interface BroadcastResult {
+  ok: string[];
+  failed: string[];
+}
+
 export interface MineResult {
   block: Block;
   attempts: number;
   elapsedMs: number;
+  broadcast: BroadcastResult;
+}
+
+export interface ResolveResult {
+  replaced: boolean;
+  newLength: number;
+  source: string | null;
+  peers: { url: string; length: number | null; valid: boolean | null }[];
 }
 
 /** 활동 일지 (journal/src/types.ts 와 동일) */
