@@ -192,7 +192,15 @@ npm run log:csv                   # CSV 내보내기
   실험 2 (data 변경 + hash 재계산 → #2 difficulty not met, #2→#3 연결 끊김)
 
   ![4단계 실험 2](docs/images/stage4-tamper-recompute.png)
-- [ ] 5단계: 노드 3개 동기화 화면
+- [x] 5단계: 노드 3개 동기화 화면
+
+  노드 3 재시작 후: 체인과 피어 목록이 모두 사라져 resolve 가 "교체 없음"
+
+  ![5단계 재시작 후 피어 소실](docs/images/stage5-restart-peers-lost.png)
+
+  피어 재등록 후 resolve: 노드 1 의 체인(길이 4)으로 교체되어 동기화 완료
+
+  ![5단계 동기화 완료](docs/images/stage5-resolve-synced.png)
 - [ ] 활동 일지 대시보드
 
 ## 결과

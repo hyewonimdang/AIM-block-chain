@@ -78,7 +78,6 @@ curl localhost:3001/chain
 연습 문제
 1. 프론트에서 중간 블록을 "hash 재계산" 으로 위변조해 보자. 어느 블록이 빨갛게 되는가? 프론트의 `isBroken` 함수와 서버 `brokenAt` 의 관계를 설명해 보자.
 2. 마지막 블록을 hash 재계산으로 위변조하면 difficulty 0 에서는 검증을 통과한다. 이것이 "확정(confirmation) 수" 개념과 어떻게 이어지는지 한 줄로 적어 보자.
-3. (도전) `tamperBlock` 에 `remine: true` 옵션을 추가해, 위변조한 블록부터 끝까지 전부 다시 채굴하도록 만들어 보자. 검증이 통과하는가? 난이도 4 에서 블록 5개면 얼마나 걸리는가?
 
 ---
 
@@ -94,9 +93,6 @@ curl localhost:3001/chain
 연습 문제
 1. 노드 3 을 끄고 노드 1 에서 블록 추가 → `broadcast.failed` 확인 → 노드 3 켜고 resolve. 로그를 적어 보자.
 2. 포크를 만들어 보자: 피어 등록 전에 노드 1 과 노드 2 에서 각각 블록을 추가한 뒤 피어 등록 → 노드 1 에서 블록 하나 더 추가 → 노드 2 는 어떤 상태인가? (`need-sync` 경로가 타는지 서버 로그/응답으로 확인)
-3. `receiveBlock` 에서 `hashMeetsDifficulty` 검사를 지우면 무엇이 가능해지는가? (악의적 노드 입장에서 생각)
-4. (도전) `resolveConflicts` 를 "길이" 대신 "nonce 합계(작업량)" 로 비교하도록 바꿔 보자. 어떤 테스트를 추가해야 하는가?
-5. (생각) 노드가 100개라면 broadcast 는 어떻게 바뀌어야 할까? 모두에게 직접 보내는 방식의 한계는?
 
 ---
 
@@ -104,11 +100,8 @@ curl localhost:3001/chain
 
 읽을 파일: `web/src/lib/hash.ts` → `components/BlockCard.tsx` → `ChainView.tsx` → `MiningView.tsx` → `NodesView.tsx`
 
-연습 문제 (프론트가 강점이므로 직접 수정하는 과제)
+연습 문제 (프론트가 강점이므로 직접 코드를 수정하는 과제)
 1. ChainView 의 화살표를 SVG 선으로 바꾸고, 끊긴 연결은 점선으로 그려 보자.
-2. MiningView 에서 nonce 증가를 64 번마다가 아니라 "매 프레임(requestAnimationFrame)" 으로 그려 보자. 성능 차이는?
-3. NodesView 에서 resolve 로 체인이 교체될 때 어느 블록이 바뀌었는지 diff 하이라이트를 넣어 보자.
-4. 활동 일지 대시보드에 "막힌 지점" 워드 클라우드나 빈도 표를 추가해 보자.
 
 ---
 
