@@ -232,7 +232,7 @@ function ConfidenceChart({ data }: { data: { label: string; confidence: number; 
         </LineChart>
       </ResponsiveContainer>
       <p style={{ color: INK, fontSize: 12, margin: "8px 0 0" }}>
-        3·4주차는 <code>npm run log -- --confidence</code> 로 입력
+        3·4주차는 <code>npm run log:confidence</code> 로 입력
       </p>
     </div>
   );

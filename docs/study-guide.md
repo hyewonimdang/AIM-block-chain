@@ -103,4 +103,4 @@ curl localhost:3001/chain
 - 작업명 예: "1단계 코드 분석 + 연습 1~3"
 - 막힌 지점은 "이해가 안 된 개념" 도 포함한다. (예: "allSettled 와 all 의 차이가 처음엔 헷갈림")
 - 흥미도와 몰입도를 솔직하게. 낮게 나온 단계가 오히려 중요한 데이터다.
-- 3·4주차 확신도: `npm run log -- --confidence`
+- 3·4주차 확신도: `npm run log:confidence`

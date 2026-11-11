@@ -23,7 +23,7 @@ AIM-block-chain/
 ├── web/       B. React + Vite 시각화 (블록 카드, 위변조, 채굴, 노드 동기화) + 활동 일지 대시보드
 ├── journal/   C. 활동 일지 CLI (입력, CSV 내보내기)
 ├── data/      activity-log.json (활동 일지 원본 데이터)
-└── docs/      review-log.md, findings.md, study-guide.md, commit-guide.md
+└── docs/      review-log.md, findings.md, study-guide.md, study-notes.md, images/
 ```
 
 ### 전체 구성
@@ -160,8 +160,8 @@ npm test -w server
 
 # 활동 일지
 npm run log                       # 작업 기록 추가
-npm run log -- --confidence       # 주차별 확신도 입력
-npm run log -- --list             # 목록
+npm run log:confidence            # 주차별 확신도 입력
+npm run log:list                  # 목록
 npm run log:csv                   # CSV 내보내기
 ```
 
@@ -182,9 +182,7 @@ npm run log:csv                   # CSV 내보내기
 
 ## 단계별 결과 스크린샷
 
-- [ ] 1단계: 블록 생성 결과 (`GET /chain`)
-- [ ] 2단계: 검증 결과
-- [ ] 3단계: 난이도별 채굴 시간
+- [x] 1~3단계: 터미널 결과는 [docs/study-notes.md](docs/study-notes.md)에 표로 기록 (prevHash 연결 표, 검증 순서 실험, 난이도별 시도 횟수, 채굴 중 블로킹 측정)
 - [x] 4단계: 위변조 후 빨간색 표시 화면
 
   실험 1 (data 만 변경 → #2 hash mismatch, 연결은 유지)
@@ -203,11 +201,12 @@ npm run log:csv                   # CSV 내보내기
   피어 재등록 후 resolve: 노드 1 의 체인(길이 4)으로 교체되어 동기화 완료
 
   ![5단계 동기화 완료](docs/images/stage5-resolve-synced.png)
-- [ ] 활동 일지 대시보드
+- [x] 활동 일지 대시보드 (5건, 확신도 7 → 4 → 6 → 7)
+
+  ![활동 일지 대시보드](docs/images/journal-dashboard.png)
 
 ## 결과
 
 - [docs/review-log.md](docs/review-log.md) — AI 코드 리뷰 누적 기록
 - [docs/findings.md](docs/findings.md) — 활동 일지 분석 및 결론
 - [docs/study-guide.md](docs/study-guide.md) — 단계별 학습 가이드와 연습 문제
-- [docs/commit-guide.md](docs/commit-guide.md) — 커밋 순서
